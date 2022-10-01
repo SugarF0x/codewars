@@ -28,6 +28,10 @@ function getCombinations(input: number) {
   return deserializeSet(results).filter(e => e.reduce((acc, val) => acc + val) === input)
 }
 
+/**
+ * this really could be improved upon by doing a downwards momentum but i mean it works :shrug:
+ */
+
 describe('numberCombos', () => {
   it.each<[number, number[][]]>([
     [
@@ -107,6 +111,33 @@ describe('numberCombos', () => {
         [2, 2, 1, 1, 1],
         [2, 1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1, 1, 1]
+      ]
+    ],
+    [
+      8,
+      [
+        [8],
+        [7, 1],
+        [6, 2],
+        [6, 1, 1],
+        [5, 3],
+        [5, 2, 1],
+        [5, 1, 1, 1],
+        [4, 4],
+        [4, 3, 1],
+        [4, 2, 2],
+        [4, 2, 1, 1],
+        [4, 1, 1, 1, 1],
+        [3, 3, 2],
+        [3, 3, 1, 1],
+        [3, 2, 2, 1],
+        [3, 2, 1, 1, 1],
+        [3, 1, 1, 1, 1, 1],
+        [2, 2, 2, 2],
+        [2, 2, 2, 1, 1],
+        [2, 2, 1, 1, 1, 1],
+        [2, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1]
       ]
     ]
   ])('should be gucci %d', (input, results) => {
