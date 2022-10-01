@@ -1,46 +1,31 @@
 // 555b1890a75b930e63000023
 import { describe, expect, it } from 'vitest'
 
-function fillFirstLevel(num: number, base: number) {
-  const results = [base]
-
-  while (results.reduce((acc, val) => acc + val) < num) {
-    const total = results.reduce((acc, val) => acc + val)
-    if (total + base <= num) results.push(base)
-    else results.push(num - base)
-  }
-
-  return results
+function deserializeSet(set: Set<string>) {
+  return Array.from(set, entry => entry.split(',').map(Number).sort().reverse()).sort().reverse()
 }
 
-function getBreakableIndexes(nums: number[]) {
-  const numsToParse = nums.slice(1).reverse()
-  const indexes = []
-
-  for (const [index, num] of numsToParse.entries()) {
-    if (num > 0) indexes.push(nums.length - 1 - index)
-  }
-
-  return indexes
+function serializeArray(array: number[]) {
+  return array.sort().join(',')
 }
 
-function getCombinations(num: number): number[][] {
-  const results = []
+function getCombinations(input: number) {
+  const results = new Set<string>()
 
-  for (let i = num; i > 0; i--) {
-    let level = fillFirstLevel(num, i)
-    results.push(level)
+  for (let i = 1; i <= input; i++) {
+    deserializeSet(results).forEach(e => {
+      for (let j = 0; j < e.length; j++) {
+        const newArray = [...e]
+        newArray[j]++
+        results.add(serializeArray(newArray))
+      }
+      results.add(serializeArray([...e, 1]))
+    })
 
-    const breakableIndexes = getBreakableIndexes(level)
-    const recordedBreakResults: number[] = []
-    for (const breakableIndex of breakableIndexes) {
-      const breakResults = getCombinations(level[breakableIndex]).slice(1)
-      results.push(...breakResults.map(e => [...level.slice(0, breakableIndex), ...e, ...recordedBreakResults]).map(e => e.flatMap(a => a)))
-      recordedBreakResults.push(...breakResults)
-    }
+    results.add(serializeArray([i]))
   }
 
-  return results
+  return deserializeSet(results).filter(e => e.reduce((acc, val) => acc + val) === input)
 }
 
 describe('numberCombos', () => {
@@ -95,6 +80,7 @@ describe('numberCombos', () => {
       [4, 2, 1],
       [4, 1, 1, 1],
       [3, 3, 1],
+      [3, 2, 2],
       [3, 2, 1, 1],
       [3, 1, 1, 1, 1],
       [2, 2, 2, 1],
@@ -102,7 +88,7 @@ describe('numberCombos', () => {
       [2, 1, 1, 1, 1, 1],
       [1, 1, 1, 1, 1, 1, 1]
     ]
-  ])('should be gucci', (results) => {
-    expect(getCombinations(results[0][0])).toMatchObject(results)
+  ])('should be gucci %#', (...results) => {
+    expect(getCombinations(results[0][0])).toMatchObject(results.map(e => e.sort().reverse()).sort().reverse())
   })
 })
