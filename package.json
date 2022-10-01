@@ -6,7 +6,8 @@
   "author": "Alexey Tuzov <sugarfox.dev@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "vitest --ui"
+    "dev": "vitest --ui",
+    "webstorm-integration": "vitest --watch --reporter=dot --reporter=json --outputFile=.vitest-result.json"
   },
   "dependencies": {},
   "devDependencies": {
