@@ -2,8 +2,15 @@
 
 import { describe, it, expect } from "vitest"
 
-function race(speedA: number, speedB: number, headstart: number): [number, number, number] | null {
-  return null
+function race(v1: number, v2: number, g: number): [number, number, number] | null {
+  if (v1 >= v2) return null
+
+  const [mps1, mps2] = [v1/3600, v2/3600]
+  const dps = mps2 - mps1
+  const time = g/dps
+
+  const date = new Date(Math.floor(time * 1000))
+  return [date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()]
 }
 
 describe('tortoise-racing', () => {
