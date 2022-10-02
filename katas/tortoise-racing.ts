@@ -9,7 +9,7 @@ function race(v1: number, v2: number, g: number): [number, number, number] | nul
   const dps = mps2 - mps1
   const time = g/dps
 
-  const date = new Date(Math.floor(time * 1000))
+  const date = new Date(Math.floor(time * 1000) + 1000 * 60 * 60 * 0.0000005)
   return [date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()]
 }
 
