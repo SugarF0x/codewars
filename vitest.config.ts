@@ -2,6 +2,6 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
-    include: ['katas/**/*.ts']
+    include: ['katas/in-progress/**/*.ts']
   }
 })
