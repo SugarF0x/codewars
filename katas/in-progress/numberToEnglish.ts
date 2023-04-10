@@ -33,9 +33,36 @@ const digitToWordMap: Record<number, string> = {
   1000: 'thousand'
 }
 
-export function numberToEnglish(x: number): string {
-  return "zero"; //your code here
+function splitByThousands(value: number): [number, number] {
+  const reverse = String(value).split('').reverse()
+  return [reverse.slice(0, 3), reverse.slice(3, 6)].map<number>(e => Number(e.reverse().join(''))).reverse() as [number, number]
 }
+
+function extractBases(value: number): [number, number, number] {
+  const stringValue = String(value).padStart(3, '0')
+  return stringValue.split('').map((item, index) => Number(item.padEnd(3 - index, '0'))) as [number, number, number]
+}
+
+function basesToLocales(values: [number, number, number]): string {
+  const [hundred, deca, single] = values
+  let [localeHundred, localeDeca, localeSingle] = ''
+
+  if (hundred !== 0) localeHundred = `${digitToWordMap[hundred / 100]} ${digitToWordMap[100]}`
+  if (deca !== 0) localeDeca = `${digitToWordMap[deca === 10 ? deca + single : deca]}`
+  if (single !== 0 && deca !== 10) localeSingle = `${digitToWordMap[single]}`
+
+  return [localeHundred, localeDeca, localeSingle].filter(Boolean).join(' ')
+}
+
+export function numberToEnglish(x: number): string {
+  if (x === 0) return digitToWordMap[0]
+
+  const split = splitByThousands(x)
+  const [thousands, singles] = split.map(extractBases).map(basesToLocales)
+
+  return [thousands, singles].filter(Boolean).join(` ${digitToWordMap[1000]} `)
+}
+
 
 describe("Sample Test Cases", function(){
   it.each([
