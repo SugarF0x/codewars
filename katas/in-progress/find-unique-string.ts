@@ -1,19 +1,21 @@
 import { describe, expect, it } from "vitest"
 
 export function findUniq(arr: string[]): string {
-  const set = new Set<string>()
-  let uniq = ''
+  const signatures = new Set<string>()
 
   for (const item of arr) {
-    const characters = item.toLowerCase().replaceAll(' ', '').split('')
+    const itemSignature = [...new Set(item.toLowerCase().replaceAll(' ', '').split('').sort())].join('')
 
-    let isUniq = characters.some(char => !set.has(char))
-    for (const character of characters) set.add(character)
+    if (!signatures.size) {
+      signatures.add(itemSignature)
+      continue
+    }
 
-    if (isUniq) uniq = item
+    if (signatures.has(itemSignature)) continue
+    return item
   }
 
-  return uniq
+  return arr[0]
 }
 
 describe('find-unique-string', () => {
