@@ -1,8 +1,38 @@
+import { describe, expect, it } from 'vitest'
+
 export default class OptionsHashRange {
   entries: Record<string, unknown>[] = []
+  set?: Set<number>
 
-  getHashSet() {
-    return new Set(this.entries.map(this.hashObject))
+  add(path: string, values: unknown[]) {
+    if (this.entries.length > 0) {
+      this.entries = this.entries.flatMap(entry => (
+        values.map(value => this.unflattenObject({
+          ...entry,
+          [path]: value
+        }))
+      ))
+    } else {
+      this.entries = values.map(value => this.unflattenObject({ [path]: value }))
+    }
+
+    return this
+  }
+
+  end() {
+    Object.freeze(this.entries)
+
+    const set = new Set(this.entries.map(entry => this.hashObject(entry)))
+    if (set.size !== this.entries.length) throw new Error('Some data has been lost. Have you configured threshold correctly?')
+    this.set = set
+
+    return this
+  }
+
+  has(input: Record<string, unknown>) {
+    if (!this.set) throw new Error('Finish defining hash range config before query')
+
+    return this.set.has(this.hashObject(input))
   }
 
   private hash(val: string) {
@@ -76,3 +106,19 @@ export default class OptionsHashRange {
     return this.hashMerge(...objectPairs)
   }
 }
+
+//
+
+describe("", () => {
+  it("should ", () => {
+    const range = new OptionsHashRange()
+      .add('some.path', [1, 2, 3, 4])
+      .add('otherPath', ['one', 'two'])
+      .add('other.supported.entry', [true, false])
+      .end()
+
+    expect(range.has({ some: { path: 1 }, otherPath: 'one', other: { supported: { entry: true } } })).toBe(true)
+    expect(range.has({ some: { path: 10 }, otherPath: 'one', other: { supported: { entry: true } } })).toBe(false)
+    expect(range.has({ some: { path: 10 }, otherPath: 'ten' })).toBe(false)
+  })
+})
