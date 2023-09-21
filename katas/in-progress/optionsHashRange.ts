@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 export default class OptionsHashRange {
-  entries: Record<string, unknown>[] = []
+  entries: Record<string, unknown>[] | null = []
   set?: Set<number>
 
   add(path: string, values: unknown[]) {
+    if (!this.entries) throw new Error("Can't modify entries after having ended configuration")
+
     if (this.entries.length > 0) {
       this.entries = this.entries.flatMap(entry => (
         values.map(value => this.unflattenObject({
@@ -20,12 +22,13 @@ export default class OptionsHashRange {
   }
 
   end() {
-    Object.freeze(this.entries)
+    if (!this.entries) throw new Error('Configuration end has already been called')
 
     const set = new Set(this.entries.map(entry => this.hashObject(entry)))
     if (set.size !== this.entries.length) throw new Error('Some data has been lost. Have you configured threshold correctly?')
     this.set = set
 
+    this.entries = null
     return this
   }
 
